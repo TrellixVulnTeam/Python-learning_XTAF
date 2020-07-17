@@ -2,4 +2,4 @@
 
 This is my first project i made when learning Python and AI
 
-Object tracking/Car_tracking.py use for find car in video and estimate it speed.
+Object tracking/Car_tracking.py use for find car in video and estimate it speed using Mobile net SSD Coco or faster RCNN (it have more accurate but with lower speed)
