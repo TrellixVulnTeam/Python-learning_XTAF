@@ -1,3 +1,5 @@
+#This script tend to use car detection model for detect car in video and estimate speed
+#import everything we need in this script
 import os
 import cv2
 import numpy as np
@@ -6,12 +8,14 @@ import sys
 import time
 from math import sqrt
 
+#Path config to model and video folder
 PATH_to_object_detection_folder = 'models/research'
 
 TYPE_DETECT = 'object_detection'
 
 PATH_TO_VIDEO = 'Videotest'
 
+#import function from model folder
 from models.research.object_detection.utils import label_map_util
 
 MODEL_FOLDER = 'inference_graph'
@@ -20,6 +24,7 @@ VIDEO_NAME = 'Cars_passing_test_3.mp4'
 img_width = 640
 img_height = 480
 
+#Function for draw bounding box with opencv
 def draw_bounding_box(image, x, y, w, h):
     return cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),1)
 
@@ -27,6 +32,7 @@ def get_bounding_box_area(x1, y1, x2, y2):
     area = ((x2-x1) + (y2-y1)) * 2
     return area
 
+#Algrothim for find location of car in past frame
 def find_nearest_white(img, target):
     nonzero = cv2.findNonZero(img)
     distances = np.sqrt((nonzero[:,:,0] - target[0]) ** 2 + (nonzero[:,:,1] - target[1]) ** 2)
@@ -35,12 +41,13 @@ def find_nearest_white(img, target):
 
 cap = cv2.VideoCapture(os.path.join(PATH_TO_VIDEO,VIDEO_NAME))
 
+#Path to model folder
 PATH_TO_CKPT = os.path.join(PATH_to_object_detection_folder,TYPE_DETECT,MODEL_FOLDER,'car_detection_ssd_mobilenet_v1_coco.pb')
 
 # Path to label map file
 PATH_TO_LABELS = os.path.join(PATH_to_object_detection_folder,TYPE_DETECT,'training','labelmap.pbtxt')
 
-# Path to videoq
+# Path to video
 PATH_TO_VIDEO = os.path.join(PATH_TO_VIDEO,VIDEO_NAME)
 
 # Number of classes the object detector can identify
@@ -94,8 +101,10 @@ with detection_graph.as_default():
         boxes = np.squeeze(boxes)
         scores = np.squeeze(scores)
 
+        #only dislay object that have more than 70% accurate
         result = np.where(scores >= 0.7)[0]
         for index in result:
+            #draw bounding box for each detected car
             y1, x1, y2, x2 = boxes[index]
             x = int(round(x1*img_width,0))
             y = int(round(y1*img_height,0))
@@ -118,9 +127,12 @@ with detection_graph.as_default():
                 diff = (1/30) / timer
                 v = distance / timer
                 v_sec = (1//(1/fps) * v) / diff
+                #estimate speed of car in video
+                #Still need to working on for improvement
                 estimate_v = (v_sec * 3600) / 3779528.0352161
                 re_calculate = center_y / img_height
                 estimate_v = estimate_v / re_calculate
+                #Display current speed on bounding box
                 cv2.putText(frame, (str(int(round(estimate_v,0)))+" km/h"), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1,
                             cv2.LINE_AA)
 
