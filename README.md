@@ -7,4 +7,4 @@ Object tracking/Car_tracking.py is a script to detect car in video and estimate 
 
 ![](car_detect.gif)
 
-And my current learning is django
+Some projects still work in progress, so it doesn't have any code yet
